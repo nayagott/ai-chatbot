@@ -1,0 +1,31 @@
+export class AppError extends Error {
+  constructor(
+    message: string,
+    public readonly statusCode: number,
+    public readonly userMessage: string
+  ) {
+    super(message);
+    this.name = 'AppError';
+  }
+}
+
+export class BedrockApiError extends AppError {
+  constructor(message: string, userMessage = 'AI 응답을 가져오는 중 오류가 발생했습니다.') {
+    super(message, 502, userMessage);
+    this.name = 'BedrockApiError';
+  }
+}
+
+export class SessionNotFoundError extends AppError {
+  constructor(message: string, userMessage = '세션을 찾을 수 없습니다.') {
+    super(message, 404, userMessage);
+    this.name = 'SessionNotFoundError';
+  }
+}
+
+export class ValidationError extends AppError {
+  constructor(message: string, userMessage = '요청 형식이 올바르지 않습니다.') {
+    super(message, 400, userMessage);
+    this.name = 'ValidationError';
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",           // 최신 Node.js 버전에 맞게 타겟 업그레이드
+    "module": "commonjs",         // 안정적인 Node.js 기본 모듈 시스템
+    "lib": ["ES2022"],            // 최신 자바스크립트 내장 기능 사용 허용
+    "outDir": "./dist",           // 빌드된 JS 파일들이 저장될 폴더
+    "rootDir": "./src",           // TS 소스 코드가 있는 폴더
+    "strict": true,               // 타입 검사를 엄격하게 (버그 방지 1등 공신)
+    "esModuleInterop": true,      // CommonJS와 ESM 라이브러리 간의 호환성 향상
+    "skipLibCheck": true,         // 외부 라이브러리(node_modules)의 타입 검사 생략 (속도 향상)
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,    // JSON 파일을 import 해서 쓸 수 있게 허용
+    "types": ["jest", "node"]     // 테스트 파일(tests/)에서 jest 전역 타입 인식
+  },
+  "include": ["src/**/*"],        // 컴파일할 대상
+  "exclude": ["node_modules", "dist"] // 컴파일에서 제외할 대상
+}
