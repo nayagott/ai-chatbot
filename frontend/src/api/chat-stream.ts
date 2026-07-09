@@ -7,6 +7,19 @@ export interface StreamMessageHandlers {
   onError?: (message: string) => void;
 }
 
+interface TokenEventData {
+  delta: string;
+}
+
+interface DoneEventData {
+  message: ChatMessage;
+  stopReason: string;
+}
+
+interface ErrorEventData {
+  message: string;
+}
+
 function dispatchSseBlock(block: string, handlers: StreamMessageHandlers): void {
   const lines = block.split('\n');
   const eventLine = lines.find((line) => line.startsWith('event: '));
@@ -14,13 +27,16 @@ function dispatchSseBlock(block: string, handlers: StreamMessageHandlers): void 
   if (!eventLine || !dataLine) return;
 
   const eventName = eventLine.replace('event: ', '');
-  const data = JSON.parse(dataLine.replace('data: ', ''));
+  const rawData = dataLine.replace('data: ', '');
 
   if (eventName === 'token') {
+    const data = JSON.parse(rawData) as TokenEventData;
     handlers.onToken?.(data.delta);
   } else if (eventName === 'done') {
+    const data = JSON.parse(rawData) as DoneEventData;
     handlers.onDone?.(data.message, data.stopReason);
   } else if (eventName === 'error') {
+    const data = JSON.parse(rawData) as ErrorEventData;
     handlers.onError?.(data.message);
   }
 }

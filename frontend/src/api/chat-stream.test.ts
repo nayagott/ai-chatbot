@@ -1,5 +1,8 @@
 import { streamMessage } from './chat-stream';
 
+// FR-FE-002: api/chat-stream.ts (SSE 파서)
+// docs/IMPLEMENTATION_PLAN.md 참조. fetch의 ReadableStream 응답을 모킹한다.
+
 function createSseStream(chunks: string[]): ReadableStream<Uint8Array> {
   const encoder = new TextEncoder();
   let index = 0;
@@ -31,7 +34,9 @@ describe('streamMessage', () => {
   });
 
   it('세션 id와 content로 스트림 엔드포인트에 POST 요청을 보낸다', async () => {
-    const fetchMock = mockFetchWithStream(['event: done\ndata: {"message":{"role":"assistant","content":""},"stopReason":"end_turn"}\n\n']);
+    const fetchMock = mockFetchWithStream([
+      'event: done\ndata: {"message":{"role":"assistant","content":""},"stopReason":"end_turn"}\n\n',
+    ]);
 
     await streamMessage('session-1', '안녕', {});
 

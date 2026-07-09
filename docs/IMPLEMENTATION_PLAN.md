@@ -62,7 +62,7 @@ interface Session {
 | 상태 | FR-ID     | 계층           | 대상                                          | 와이어프레임 매핑                                     | 의존                    |
 | ---- | --------- | -------------- | --------------------------------------------- | ----------------------------------------------------- | ----------------------- |
 | ✅   | FR-FE-001 | API 클라이언트 | `api/session-api.ts` (create/get/delete/list) | -                                                     | FR-BE-001~004           |
-| ⬜   | FR-FE-002 | API 클라이언트 | `api/chat-stream.ts` (SSE 파서)               | -                                                     | FR-BE-005               |
+| ✅   | FR-FE-002 | API 클라이언트 | `api/chat-stream.ts` (SSE 파서)               | -                                                     | FR-BE-005               |
 | ⬜   | FR-FE-003 | 훅             | `useSessions` (목록 로드/생성/선택)           | -                                                     | FR-FE-001               |
 | ⬜   | FR-FE-004 | 훅             | `useChatStream` (전송/스트리밍 상태)          | -                                                     | FR-FE-002               |
 | ⬜   | FR-FE-005 | 컴포넌트       | `MessageInput`                                | **E**: 입력창 + 전송 버튼                             | -                       |
