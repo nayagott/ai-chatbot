@@ -37,6 +37,15 @@ export function createSessionRouter(sessionStore: SessionStore): Router {
     }
   });
 
+  router.delete('/:id', (req, res) => {
+    try {
+      sessionStore.delete(req.params.id);
+      res.status(204).end();
+    } catch (error) {
+      sendErrorResponse(res, error);
+    }
+  });
+
   router.post('/:id/messages/stream', async (req, res) => {
     try {
       const { role, content } = req.body as StreamRequestBody;

@@ -80,6 +80,29 @@ describe('GET /sessions/:id (FR-BE-002)', () => {
   });
 });
 
+describe('DELETE /sessions/:id (FR-BE-003)', () => {
+  it('세션을 삭제하고 204를 반환한다', async () => {
+    const app = createApp();
+    const created = await request(app).post('/sessions');
+
+    const res = await request(app).delete(`/sessions/${created.body.id}`);
+
+    expect(res.status).toBe(204);
+    const getRes = await request(app).get(`/sessions/${created.body.id}`);
+    expect(getRes.status).toBe(404);
+  });
+
+  it('존재하지 않는 세션을 삭제하면 404와 한국어 에러 메시지를 반환한다', async () => {
+    const app = createApp();
+
+    const res = await request(app).delete('/sessions/없는-id');
+
+    expect(res.status).toBe(404);
+    expect(typeof res.body.error).toBe('string');
+    expect(res.body.error).toMatch(/[가-힣]/);
+  });
+});
+
 describe('POST /sessions/:id/messages/stream (FR-BE-005)', () => {
   beforeEach(() => {
     bedrockMock.reset();

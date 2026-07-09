@@ -43,3 +43,20 @@ describe('SessionStore.get() (FR-BE-002)', () => {
     expect(() => store.get('없는-id')).toThrow(SessionNotFoundError);
   });
 });
+
+describe('SessionStore.delete() (FR-BE-003)', () => {
+  it('삭제 후 조회하면 SessionNotFoundError를 던진다', () => {
+    const store = new SessionStore();
+    const created = store.create();
+
+    store.delete(created.id);
+
+    expect(() => store.get(created.id)).toThrow(SessionNotFoundError);
+  });
+
+  it('존재하지 않는 id를 삭제하면 SessionNotFoundError를 던진다', () => {
+    const store = new SessionStore();
+
+    expect(() => store.delete('없는-id')).toThrow(SessionNotFoundError);
+  });
+});

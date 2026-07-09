@@ -23,4 +23,10 @@ export class SessionStore {
     }
     return session;
   }
+
+  delete(id: string): void {
+    if (!this.sessions.delete(id)) {
+      throw new SessionNotFoundError(`Session not found: ${id}`);
+    }
+  }
 }
