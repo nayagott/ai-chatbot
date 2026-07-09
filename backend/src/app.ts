@@ -1,9 +1,11 @@
 import express, { Express } from 'express';
 import { createSessionRouter } from './routes/session-router';
+import { SessionStore } from './services/session-store';
 
 export function createApp(): Express {
   const app = express();
   app.use(express.json());
-  app.use('/sessions', createSessionRouter());
+  const sessionStore = new SessionStore();
+  app.use('/sessions', createSessionRouter(sessionStore));
   return app;
 }

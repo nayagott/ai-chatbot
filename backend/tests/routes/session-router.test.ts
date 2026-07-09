@@ -44,6 +44,20 @@ function parseSseEvents(text: string): Array<{ event: string; data: unknown }> {
     });
 }
 
+describe('POST /sessions (FR-BE-001)', () => {
+  it('새 세션을 생성하고 201로 응답한다', async () => {
+    const app = createApp();
+
+    const res = await request(app).post('/sessions');
+
+    expect(res.status).toBe(201);
+    expect(typeof res.body.id).toBe('string');
+    expect(res.body.messages).toEqual([]);
+    expect(typeof res.body.createdAt).toBe('number');
+    expect(typeof res.body.updatedAt).toBe('number');
+  });
+});
+
 describe('POST /sessions/:id/messages/stream (FR-BE-005)', () => {
   beforeEach(() => {
     bedrockMock.reset();

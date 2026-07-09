@@ -1,7 +1,7 @@
-import { randomUUID } from 'crypto';
 import { Router } from 'express';
 import { ConversationRole } from '@aws-sdk/client-bedrock-runtime';
 import { BedrockService } from '../services/bedrock-service';
+import { SessionStore } from '../services/session-store';
 import { AppError, ValidationError } from '../types';
 
 interface StreamRequestBody {
@@ -11,11 +11,12 @@ interface StreamRequestBody {
 
 const bedrockService = new BedrockService();
 
-export function createSessionRouter(): Router {
+export function createSessionRouter(sessionStore: SessionStore): Router {
   const router = Router();
 
   router.post('/', (_req, res) => {
-    res.status(201).json({ id: randomUUID() });
+    const session = sessionStore.create();
+    res.status(201).json(session);
   });
 
   router.post('/:id/messages/stream', async (req, res) => {
