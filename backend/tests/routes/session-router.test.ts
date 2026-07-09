@@ -103,6 +103,30 @@ describe('DELETE /sessions/:id (FR-BE-003)', () => {
   });
 });
 
+describe('GET /sessions (FR-BE-004)', () => {
+  it('세션이 없으면 빈 배열을 반환한다', async () => {
+    const app = createApp();
+
+    const res = await request(app).get('/sessions');
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual([]);
+  });
+
+  it('생성된 세션 목록을 반환한다', async () => {
+    const app = createApp();
+    const first = await request(app).post('/sessions');
+    const second = await request(app).post('/sessions');
+
+    const res = await request(app).get('/sessions');
+
+    expect(res.status).toBe(200);
+    expect(res.body.map((session: { id: string }) => session.id).sort()).toEqual(
+      [first.body.id, second.body.id].sort()
+    );
+  });
+});
+
 describe('POST /sessions/:id/messages/stream (FR-BE-005)', () => {
   beforeEach(() => {
     bedrockMock.reset();

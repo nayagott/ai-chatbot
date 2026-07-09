@@ -28,6 +28,10 @@ export function createSessionRouter(sessionStore: SessionStore): Router {
     res.status(201).json(session);
   });
 
+  router.get('/', (_req, res) => {
+    res.status(200).json(sessionStore.list());
+  });
+
   router.get('/:id', (req, res) => {
     try {
       const session = sessionStore.get(req.params.id);

@@ -29,4 +29,8 @@ export class SessionStore {
       throw new SessionNotFoundError(`Session not found: ${id}`);
     }
   }
+
+  list(): Session[] {
+    return [...this.sessions.values()].sort((a, b) => b.updatedAt - a.updatedAt);
+  }
 }

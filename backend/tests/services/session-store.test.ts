@@ -60,3 +60,37 @@ describe('SessionStore.delete() (FR-BE-003)', () => {
     expect(() => store.delete('없는-id')).toThrow(SessionNotFoundError);
   });
 });
+
+describe('SessionStore.list() (FR-BE-004)', () => {
+  it('세션이 없으면 빈 배열을 반환한다', () => {
+    const store = new SessionStore();
+
+    expect(store.list()).toEqual([]);
+  });
+
+  it('생성된 모든 세션을 반환한다', () => {
+    const store = new SessionStore();
+    const first = store.create();
+    const second = store.create();
+
+    const list = store.list();
+
+    expect(list.map((session) => session.id).sort()).toEqual(
+      [first.id, second.id].sort()
+    );
+  });
+
+  it('updatedAt 내림차순으로 정렬한다', () => {
+    const store = new SessionStore();
+    const nowSpy = vi.spyOn(Date, 'now');
+    nowSpy.mockReturnValueOnce(1000);
+    const older = store.create();
+    nowSpy.mockReturnValueOnce(2000);
+    const newer = store.create();
+    nowSpy.mockRestore();
+
+    const list = store.list();
+
+    expect(list.map((session) => session.id)).toEqual([newer.id, older.id]);
+  });
+});
