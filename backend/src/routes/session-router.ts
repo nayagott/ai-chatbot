@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Response, Router } from 'express';
 import { ConversationRole } from '@aws-sdk/client-bedrock-runtime';
 import { BedrockService } from '../services/bedrock-service';
 import { SessionStore } from '../services/session-store';
@@ -11,12 +11,30 @@ interface StreamRequestBody {
 
 const bedrockService = new BedrockService();
 
+function sendErrorResponse(res: Response, error: unknown): void {
+  if (error instanceof AppError) {
+    res.status(error.statusCode).json({ error: error.userMessage });
+    return;
+  }
+  console.error('Unexpected error:', error instanceof Error ? error.message : String(error));
+  res.status(500).json({ error: '서버 오류가 발생했습니다.' });
+}
+
 export function createSessionRouter(sessionStore: SessionStore): Router {
   const router = Router();
 
   router.post('/', (_req, res) => {
     const session = sessionStore.create();
     res.status(201).json(session);
+  });
+
+  router.get('/:id', (req, res) => {
+    try {
+      const session = sessionStore.get(req.params.id);
+      res.status(200).json(session);
+    } catch (error) {
+      sendErrorResponse(res, error);
+    }
   });
 
   router.post('/:id/messages/stream', async (req, res) => {
@@ -59,12 +77,7 @@ export function createSessionRouter(sessionStore: SessionStore): Router {
       );
       res.end();
     } catch (error) {
-      if (error instanceof AppError) {
-        res.status(error.statusCode).json({ error: error.userMessage });
-        return;
-      }
-      console.error('Unexpected error:', error instanceof Error ? error.message : String(error));
-      res.status(500).json({ error: '서버 오류가 발생했습니다.' });
+      sendErrorResponse(res, error);
     }
   });
 

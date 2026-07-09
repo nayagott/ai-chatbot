@@ -58,6 +58,28 @@ describe('POST /sessions (FR-BE-001)', () => {
   });
 });
 
+describe('GET /sessions/:id (FR-BE-002)', () => {
+  it('존재하는 세션을 200으로 반환한다', async () => {
+    const app = createApp();
+    const created = await request(app).post('/sessions');
+
+    const res = await request(app).get(`/sessions/${created.body.id}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual(created.body);
+  });
+
+  it('존재하지 않는 세션은 404와 한국어 에러 메시지를 반환한다', async () => {
+    const app = createApp();
+
+    const res = await request(app).get('/sessions/없는-id');
+
+    expect(res.status).toBe(404);
+    expect(typeof res.body.error).toBe('string');
+    expect(res.body.error).toMatch(/[가-힣]/);
+  });
+});
+
 describe('POST /sessions/:id/messages/stream (FR-BE-005)', () => {
   beforeEach(() => {
     bedrockMock.reset();

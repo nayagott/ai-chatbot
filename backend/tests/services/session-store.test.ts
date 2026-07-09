@@ -1,6 +1,8 @@
 import { SessionStore } from '../../src/services/session-store';
+import { SessionNotFoundError } from '../../src/types';
 
 // FR-BE-001: POST /sessions 선행 작업 — SessionStore.create()
+// FR-BE-002: GET /sessions/:id 선행 작업 — SessionStore.get()
 // docs/IMPLEMENTATION_PLAN.md 참조.
 
 describe('SessionStore.create() (FR-BE-001)', () => {
@@ -24,5 +26,20 @@ describe('SessionStore.create() (FR-BE-001)', () => {
     const second = store.create();
 
     expect(first.id).not.toBe(second.id);
+  });
+});
+
+describe('SessionStore.get() (FR-BE-002)', () => {
+  it('존재하는 세션을 반환한다', () => {
+    const store = new SessionStore();
+    const created = store.create();
+
+    expect(store.get(created.id)).toEqual(created);
+  });
+
+  it('존재하지 않으면 SessionNotFoundError를 던진다', () => {
+    const store = new SessionStore();
+
+    expect(() => store.get('없는-id')).toThrow(SessionNotFoundError);
   });
 });

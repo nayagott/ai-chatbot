@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto';
-import { Session } from '../types';
+import { Session, SessionNotFoundError } from '../types';
 
 export class SessionStore {
   private readonly sessions = new Map<string, Session>();
@@ -13,6 +13,14 @@ export class SessionStore {
       updatedAt: now,
     };
     this.sessions.set(session.id, session);
+    return session;
+  }
+
+  get(id: string): Session {
+    const session = this.sessions.get(id);
+    if (!session) {
+      throw new SessionNotFoundError(`Session not found: ${id}`);
+    }
     return session;
   }
 }

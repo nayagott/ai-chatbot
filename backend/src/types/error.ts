@@ -22,3 +22,10 @@ export class BedrockApiError extends AppError {
     this.name = 'BedrockApiError';
   }
 }
+
+export class SessionNotFoundError extends AppError {
+  constructor(message: string, userMessage = '세션을 찾을 수 없습니다.') {
+    super(message, 404, userMessage);
+    this.name = 'SessionNotFoundError';
+  }
+}
