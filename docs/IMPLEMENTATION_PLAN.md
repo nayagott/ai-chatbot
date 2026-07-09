@@ -67,7 +67,7 @@ interface Session {
 | ✅   | FR-FE-004 | 훅             | `useChatStream` (전송/스트리밍 상태)          | -                                                     | FR-FE-002               |
 | ✅   | FR-FE-005 | 컴포넌트       | `MessageInput`                                | **E**: 입력창 + 전송 버튼                             | -                       |
 | ✅   | FR-FE-006 | 컴포넌트       | `MessageList`                                 | **D/G**: 메시지 목록, 로딩 상태 (ToolResultCard 제외) | -                       |
-| ⬜   | FR-FE-007 | 컴포넌트       | `Sidebar`                                     | **B**: 새 대화, 세션 목록                             | -                       |
+| ✅   | FR-FE-007 | 컴포넌트       | `Sidebar`                                     | **B**: 새 대화, 세션 목록                             | -                       |
 | ⬜   | FR-FE-008 | 컴포넌트       | `Header`                                      | **A/F**: 로고/제목, 모바일 햄버거                     | -                       |
 | ⬜   | FR-FE-009 | 컴포넌트       | `ChatArea`                                    | **C**: D+E 컨테이너                                   | FR-FE-005, 006          |
 | ⬜   | FR-FE-010 | 통합           | `App`                                         | 전체 조합 (A+B+C), 768px 반응형 사이드바 토글         | FR-FE-003, 004, 007~009 |

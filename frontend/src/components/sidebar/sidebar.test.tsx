@@ -3,6 +3,9 @@ import userEvent from '@testing-library/user-event';
 import { Sidebar } from './sidebar';
 import type { Session } from '../../types';
 
+// FR-FE-007: Sidebar (B: 새 대화, 세션 목록)
+// docs/IMPLEMENTATION_PLAN.md 참조.
+
 const sessions: Session[] = [
   { id: 'session-1', messages: [], createdAt: 1, updatedAt: 2 },
   { id: 'session-2', messages: [], createdAt: 1, updatedAt: 1 },
