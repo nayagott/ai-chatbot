@@ -1,94 +1,52 @@
-import dotenv from 'dotenv';
-import { BedrockRuntimeClient, ConverseCommand, ConverseStreamCommand } from '@aws-sdk/client-bedrock-runtime';
-import { ChatMessage, BedrockConverseResponse, BedrockStreamEvent, BedrockApiError } from '../types';
+import {
+  BedrockRuntimeClient,
+  ConversationRole,
+  ConverseStreamCommand,
+  ConverseStreamOutput,
+} from '@aws-sdk/client-bedrock-runtime';
+import { BedrockApiError, BedrockStreamEvent } from '../types';
 
-dotenv.config();
-
-const DEFAULT_REGION = process.env.AWS_REGION ?? 'us-east-1';
-const DEFAULT_MODEL_ID = process.env.BEDROCK_MODEL_ID ?? 'global.anthropic.claude-sonnet-4-6';
-
-interface BedrockServiceConfig {
-  client?: BedrockRuntimeClient;
-  modelId?: string;
-  region?: string;
-}
-
-function toBedrockMessages(messages: ChatMessage[]) {
-  return messages.map((message) => ({
-    role: message.role,
-    content: [{ text: message.content }],
-  }));
-}
+const MODEL_ID = 'global.anthropic.claude-sonnet-4-6';
 
 export class BedrockService {
   private readonly client: BedrockRuntimeClient;
-  public readonly modelId: string;
-  public readonly region: string;
 
-  constructor(config: BedrockServiceConfig = {}) {
-    this.region = config.region ?? DEFAULT_REGION;
-    this.client = config.client ?? new BedrockRuntimeClient({ region: this.region });
-    this.modelId = config.modelId ?? DEFAULT_MODEL_ID;
+  constructor(client: BedrockRuntimeClient = new BedrockRuntimeClient({ region: 'us-east-1' })) {
+    this.client = client;
   }
 
-  async converse(messages: ChatMessage[], systemPrompt?: string): Promise<BedrockConverseResponse> {
+  async converseStream(
+    content: string,
+    role: ConversationRole = ConversationRole.USER
+  ): Promise<AsyncIterable<BedrockStreamEvent>> {
+    let stream: AsyncIterable<ConverseStreamOutput> | undefined;
     try {
       const response = await this.client.send(
-        new ConverseCommand({
-          modelId: this.modelId,
-          messages: toBedrockMessages(messages),
-          ...(systemPrompt ? { system: [{ text: systemPrompt }] } : {}),
+        new ConverseStreamCommand({
+          modelId: MODEL_ID,
+          messages: [{ role, content: [{ text: content }] }],
         })
       );
-
-      const content = response.output?.message?.content?.[0];
-      const text = content && 'text' in content ? content.text ?? '' : '';
-
-      return {
-        message: { role: 'assistant', content: text },
-        stopReason: response.stopReason ?? '',
-        usage: {
-          inputTokens: response.usage?.inputTokens ?? 0,
-          outputTokens: response.usage?.outputTokens ?? 0,
-        },
-      };
+      stream = response.stream;
     } catch (error) {
-      throw new BedrockApiError(error instanceof Error ? error.message : String(error));
+      const message = error instanceof Error ? error.message : String(error);
+      console.error('Bedrock ConverseStream request failed:', message);
+      throw new BedrockApiError(message);
     }
+
+    return this.mapEvents(stream);
   }
 
-  async *converseStream(
-    messages: ChatMessage[],
-    systemPrompt?: string
+  private async *mapEvents(
+    stream: AsyncIterable<ConverseStreamOutput> | undefined
   ): AsyncGenerator<BedrockStreamEvent> {
-    let response;
-    try {
-      response = await this.client.send(
-        new ConverseStreamCommand({
-          modelId: this.modelId,
-          messages: toBedrockMessages(messages),
-          ...(systemPrompt ? { system: [{ text: systemPrompt }] } : {}),
-        })
-      );
-    } catch (error) {
-      throw new BedrockApiError(error instanceof Error ? error.message : String(error));
-    }
+    if (!stream) return;
 
-    if (!response.stream) {
-      return;
-    }
-
-    for await (const chunk of response.stream) {
-      if (chunk.messageStart) {
-        yield { type: 'messageStart' };
-      } else if (chunk.contentBlockDelta) {
+    for await (const chunk of stream) {
+      if (chunk.contentBlockDelta) {
         yield { type: 'contentBlockDelta', delta: chunk.contentBlockDelta.delta?.text ?? '' };
-      } else if (chunk.contentBlockStop) {
-        yield { type: 'contentBlockStop' };
       } else if (chunk.messageStop) {
         yield { type: 'messageStop', stopReason: chunk.messageStop.stopReason };
-      } else if (chunk.metadata) {
-        yield { type: 'metadata' };
       }
     }
   }

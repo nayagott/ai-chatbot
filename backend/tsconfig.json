@@ -10,7 +10,7 @@
     "skipLibCheck": true,         // 외부 라이브러리(node_modules)의 타입 검사 생략 (속도 향상)
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,    // JSON 파일을 import 해서 쓸 수 있게 허용
-    "types": ["jest", "node"]     // 테스트 파일(tests/)에서 jest 전역 타입 인식
+    "types": ["vitest/globals", "node"] // 테스트 파일(tests/)에서 vitest 전역 타입 인식
   },
   "include": ["src/**/*"],        // 컴파일할 대상
   "exclude": ["node_modules", "dist"] // 컴파일에서 제외할 대상
