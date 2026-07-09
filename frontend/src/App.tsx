@@ -68,7 +68,10 @@ function App() {
     <div className="app">
       <Header title="AI 챗봇" onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)} />
       <div className="app-body">
-        <div className={`sidebar${isSidebarOpen ? ' sidebar--open' : ''}`}>
+        <div
+          data-testid="sidebar-panel"
+          className={`sidebar${isSidebarOpen ? ' sidebar--open' : ''}`}
+        >
           <Sidebar
             sessions={sessions}
             activeSessionId={activeSessionId}

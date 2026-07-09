@@ -6,6 +6,9 @@ import * as chatStream from './api/chat-stream';
 import type { Session } from './types';
 import type { StreamMessageHandlers } from './api/chat-stream';
 
+// FR-FE-010: App (전체 조합 A+B+C, 768px 반응형 사이드바 토글)
+// docs/IMPLEMENTATION_PLAN.md 참조. session-api/chat-stream은 vi.mock으로 모킹한다.
+
 vi.mock('./api/session-api');
 vi.mock('./api/chat-stream');
 
@@ -19,7 +22,7 @@ describe('App', () => {
     const newSession: Session = { id: 'session-1', messages: [], createdAt: 1, updatedAt: 1 };
     vi.mocked(sessionApi.createSession).mockResolvedValue(newSession);
     vi.mocked(chatStream.streamMessage).mockImplementation(
-      async (_id: string, _content: string, handlers: StreamMessageHandlers) => {
+      async (_sessionId: string, _content: string, handlers: StreamMessageHandlers) => {
         handlers.onToken?.('반갑');
         handlers.onDone?.({ role: 'assistant', content: '반갑습니다' }, 'end_turn');
       }
@@ -43,7 +46,7 @@ describe('App', () => {
     );
   });
 
-  it('활성 세션이 없으면 사이드바에서 세션을 선택할 수 있다', async () => {
+  it('세션을 선택하면 해당 세션의 메시지 히스토리가 표시된다', async () => {
     const user = userEvent.setup();
     const sessions: Session[] = [
       {
@@ -60,5 +63,21 @@ describe('App', () => {
     await user.click(await screen.findByTestId('session-item'));
 
     expect(await screen.findByText('이전 대화')).toBeInTheDocument();
+  });
+
+  it('모바일 폭(≤768px)에서 햄버거 클릭 시 사이드바가 토글된다', async () => {
+    const user = userEvent.setup();
+
+    render(<App />);
+    await waitFor(() => expect(sessionApi.listSessions).toHaveBeenCalled());
+
+    const sidebarPanel = screen.getByTestId('sidebar-panel');
+    expect(sidebarPanel.className).not.toMatch(/sidebar--open/);
+
+    await user.click(screen.getByRole('button', { name: '메뉴 열기' }));
+    expect(sidebarPanel.className).toMatch(/sidebar--open/);
+
+    await user.click(screen.getByRole('button', { name: '메뉴 열기' }));
+    expect(sidebarPanel.className).not.toMatch(/sidebar--open/);
   });
 });
