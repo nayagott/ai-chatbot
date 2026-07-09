@@ -1,6 +1,9 @@
 import { createSession, deleteSession, getSession, listSessions } from './session-api';
 import type { Session } from '../types';
 
+// FR-FE-001: api/session-api.ts (create/get/delete/list)
+// docs/IMPLEMENTATION_PLAN.md 참조. fetch는 vi.stubGlobal로 모킹한다.
+
 const sampleSession: Session = {
   id: 'session-1',
   messages: [],
