@@ -3,6 +3,9 @@ import userEvent from '@testing-library/user-event';
 import { ChatArea } from './chat-area';
 import type { ChatMessage } from '../../types';
 
+// FR-FE-009: ChatArea (C: D+E 컨테이너)
+// docs/IMPLEMENTATION_PLAN.md 참조.
+
 describe('ChatArea', () => {
   it('MessageList와 MessageInput을 함께 렌더링한다', () => {
     const messages: ChatMessage[] = [{ role: 'user', content: '안녕' }];
