@@ -2,6 +2,9 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MessageInput } from './message-input';
 
+// FR-FE-005: MessageInput (E: 입력창 + 전송 버튼)
+// docs/IMPLEMENTATION_PLAN.md 참조.
+
 describe('MessageInput', () => {
   it('입력값을 입력하고 전송 버튼을 클릭하면 onSend가 내용과 함께 호출된다', async () => {
     const user = userEvent.setup();
