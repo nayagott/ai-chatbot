@@ -76,6 +76,41 @@ describe('SessionStore', () => {
     });
   });
 
+  describe('list', () => {
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it('세션이 없으면 빈 배열을 반환한다', () => {
+      expect(store.list()).toEqual([]);
+    });
+
+    it('생성된 모든 세션을 반환한다', () => {
+      const first = store.create();
+      const second = store.create();
+
+      const result = store.list();
+      expect(result).toHaveLength(2);
+      expect(result.map((session) => session.id)).toEqual(
+        expect.arrayContaining([first.id, second.id])
+      );
+    });
+
+    it('updatedAt 기준 내림차순으로 정렬해서 반환한다', () => {
+      jest.useFakeTimers().setSystemTime(1000);
+      const first = store.create();
+
+      jest.setSystemTime(2000);
+      const second = store.create();
+
+      jest.setSystemTime(3000);
+      store.addMessage(first.id, { role: 'user', content: '안녕' });
+
+      const result = store.list();
+      expect(result.map((session) => session.id)).toEqual([first.id, second.id]);
+    });
+  });
+
   describe('delete', () => {
     it('세션을 삭제하면 이후 조회 시 SessionNotFoundError를 던진다', () => {
       const session = store.create();

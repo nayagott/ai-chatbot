@@ -11,6 +11,10 @@ export class SessionStore {
     return session;
   }
 
+  list(): Session[] {
+    return Array.from(this.sessions.values()).sort((a, b) => b.updatedAt - a.updatedAt);
+  }
+
   get(id: string): Session {
     const session = this.sessions.get(id);
     if (!session) {
