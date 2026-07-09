@@ -2,6 +2,9 @@ import { render, screen } from '@testing-library/react';
 import { MessageList } from './message-list';
 import type { ChatMessage } from '../../types';
 
+// FR-FE-006: MessageList (D/G: 메시지 목록, 로딩 상태 — ToolResultCard 제외)
+// docs/IMPLEMENTATION_PLAN.md 참조.
+
 describe('MessageList', () => {
   it('메시지들을 순서대로 렌더링한다', () => {
     const messages: ChatMessage[] = [
